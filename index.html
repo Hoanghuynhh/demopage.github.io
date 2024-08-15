@@ -15,6 +15,10 @@
             font-family: Arial, sans-serif;
             display: flex;
             background-color: #f0f2f5;
+            overflow: hidden;
+        }
+        body.loaded {
+            overflow: auto;
         }
         .sidebar {
             position: fixed;
@@ -130,7 +134,7 @@
             white-space: nowrap;
             line-height: 1.3;
             text-align: center;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            /*box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);*/
             transition: 0s;
             opacity: 0;
             pointer-events: none;
@@ -204,27 +208,53 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        #loading-screen {
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #11101d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        #loading-screen.fade-out {
+            opacity: 0;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loader"></div>
+    </div>
+
     <div class="sidebar">
         <div class="logo_content">
             <div class="logo">
                 <i class="fas fa-map-marked-alt"></i>
-                <div class="logo_name">BẢN ĐỒ SỐ HOÁ</div>
+                <div class="logo_name">BẢN ĐỒ XANH</div>
             </div>
             <i class="fas fa-bars" id="btn"></i>
         </div>
         <ul class="nav_list">
             <li>
-                <a href="#" class="nav-link active" data-target="map">
-                    <i class="fas fa-map"></i>
-                    <span class="links_name">Bản đồ xanh</span>
-                </a>
-                <span class="tooltip">Bản đồ xanh</span>
-            </li>
-            <li>
-                <a href="#" class="nav-link" data-target="tourism">
+                <a href="#" class="nav-link active" data-target="tourism">
                     <i class="fas fa-tree"></i>
                     <span class="links_name">Khu du lịch xanh</span>
                 </a>
@@ -238,7 +268,7 @@
                 <span class="tooltip">Địa điểm ăn uống</span>
             </li>
             <li>
-                <a href="#" class="nav-link" data-target="history">
+                <a href="#" class="nav-link" data-target="planting">
                     <i class="fas fa-seedling"></i>
                     <span class="links_name">Điểm trồng cây xanh</span>
                 </a>
@@ -247,11 +277,7 @@
         </ul>
     </div>
     <div class="content">
-        <div id="map" class="content-section active">
-            <h2>Bản đồ xanh</h2>
-            <p>Hiển thị bản đồ các địa điểm xanh trên địa bàn huyện Củ Chi.</p>
-        </div>
-        <div id="tourism" class="content-section">
+        <div id="tourism" class="content-section active">
             <h2>Khu du lịch xanh</h2>
             <p>Danh sách và thông tin về các khu du lịch xanh tại Củ Chi.</p>
         </div>
@@ -259,12 +285,14 @@
             <h2>Địa điểm ăn uống nổi tiếng trên địa bàn</h2>
             <p>Giới thiệu các quán ăn, nhà hàng đặc sắc tại Củ Chi.</p>
         </div>
-        <div id="history" class="content-section">
+        <div id="planting" class="content-section">
             <h2>Điểm trồng cây xanh</h2>
             <p>Thông tin về các điểm trồng cây xanh tại Củ Chi.</p>
         </div>
     </div>
     <script>
+        let startTime = new Date().getTime();
+
         let btn = document.querySelector("#btn");
         let sidebar = document.querySelector(".sidebar");
         let navLinks = document.querySelectorAll(".nav-link");
@@ -305,7 +333,21 @@
         });
 
         window.addEventListener('load', () => {
-            let homeLink = document.querySelector('.nav-link[data-target="map"]');
+            let endTime = new Date().getTime();
+            let loadTime = endTime - startTime;
+            let minLoadTime = Math.max(loadTime, 1000);
+
+            setTimeout(function() {
+                let loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.classList.add('fade-out');
+                
+                loadingScreen.addEventListener('transitionend', function() {
+                    loadingScreen.style.display = 'none';
+                    document.body.classList.add('loaded');
+                }, { once: true });
+            }, minLoadTime);
+
+            let homeLink = document.querySelector('.nav-link[data-target="tourism"]');
             let ripple = document.createElement('span');
             ripple.className = 'ripple';
             ripple.style.left = '50%';
@@ -318,7 +360,6 @@
             }, 600);
         });
 
-        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
