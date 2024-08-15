@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bản đồ xanh</title>
+    <title>Bản đồ số hóa</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -242,18 +242,18 @@
         }
         .footer {
             position: fixed;
-            left: 0;
+            left: 78px;
             bottom: 0;
-            width: 100%;
+            right: 0;
             background-color: #11101d;
             color: white;
             text-align: center;
             padding: 10px;
             font-size: 14px;
             transition: all 0.5s ease;
+            z-index: 97;
         }
         .sidebar.active ~ .footer {
-            width: calc(100% - 240px);
             left: 240px;
         }
         .header {
@@ -293,7 +293,6 @@
             font-size: 16px;
             margin-top: 5px;
             color: #11101d;
-            /*font-weight: bold;*/
         }
     </style>
 </head>
