@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bản đồ số hoá</title>
+    <title>Bản đồ số hóa</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -14,6 +14,7 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
+            background-color: #f0f2f5;
         }
         .sidebar {
             position: fixed;
@@ -26,6 +27,7 @@
             transition: all 0.5s ease;
             z-index: 99;
             overflow: hidden;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
         .sidebar.active {
             width: 240px;
@@ -65,6 +67,7 @@
             text-align: center;
             line-height: 50px;
             transform: translateX(-50%);
+            cursor: pointer;
         }
         .sidebar.active #btn {
             left: 90%;
@@ -85,7 +88,7 @@
             display: flex;
             align-items: center;
             text-decoration: none;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             border-radius: 12px;
             white-space: nowrap;
             position: relative;
@@ -94,6 +97,7 @@
         .sidebar ul li a:hover {
             color: #11101d;
             background: #fff;
+            transform: translateX(5px);
         }
         .sidebar ul li i {
             height: 50px;
@@ -178,10 +182,27 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .content-section.active {
             opacity: 1;
             visibility: visible;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .content-section h2 {
+            color: #11101d;
+            margin-bottom: 15px;
+        }
+        .content-section p {
+            color: #555;
+            line-height: 1.6;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -218,17 +239,16 @@
             </li>
             <li>
                 <a href="#" class="nav-link" data-target="history">
-                    <i class="fas fa-landmark"></i>
-                    <span class="links_name">Di tích lịch sử</span>
+                    <i class="fas fa-seedling"></i>
+                    <span class="links_name">Điểm trồng cây xanh</span>
                 </a>
-                <span class="tooltip">Di tích lịch sử</span>
+                <span class="tooltip">Điểm trồng cây xanh</span>
             </li>
         </ul>
     </div>
-
     <div class="content">
         <div id="map" class="content-section active">
-            <h2>Bản đồ xanh Huyện Củ Chi</h2>
+            <h2>Bản đồ xanh</h2>
             <p>Hiển thị bản đồ các địa điểm xanh trên địa bàn huyện Củ Chi.</p>
         </div>
         <div id="tourism" class="content-section">
@@ -236,15 +256,14 @@
             <p>Danh sách và thông tin về các khu du lịch xanh tại Củ Chi.</p>
         </div>
         <div id="food" class="content-section">
-            <h2>Địa điểm ăn uống trên địa bàn</h2>
+            <h2>Địa điểm ăn uống nổi tiếng trên địa bàn</h2>
             <p>Giới thiệu các quán ăn, nhà hàng đặc sắc tại Củ Chi.</p>
         </div>
         <div id="history" class="content-section">
-            <h2>Khu di tích lịch sử</h2>
-            <p>Thông tin về các di tích lịch sử quan trọng tại Củ Chi.</p>
+            <h2>Điểm trồng cây xanh</h2>
+            <p>Thông tin về các điểm trồng cây xanh tại Củ Chi.</p>
         </div>
     </div>
-
     <script>
         let btn = document.querySelector("#btn");
         let sidebar = document.querySelector(".sidebar");
@@ -258,7 +277,6 @@
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-
                 navLinks.forEach(item => item.classList.remove('active'));
                 this.classList.add('active');
 
@@ -273,14 +291,11 @@
 
                 let ripple = document.createElement('span');
                 ripple.className = 'ripple';
-                
                 let rect = this.getBoundingClientRect();
                 let x = e.clientX - rect.left;
                 let y = e.clientY - rect.top;
-                
                 ripple.style.left = `${x}px`;
                 ripple.style.top = `${y}px`;
-
                 this.appendChild(ripple);
 
                 setTimeout(() => {
@@ -293,16 +308,24 @@
             let homeLink = document.querySelector('.nav-link[data-target="map"]');
             let ripple = document.createElement('span');
             ripple.className = 'ripple';
-            
             ripple.style.left = '50%';
             ripple.style.top = '50%';
             ripple.style.transform = 'translate(-50%, -50%)';
-
             homeLink.appendChild(ripple);
 
             setTimeout(() => {
                 ripple.remove();
             }, 600);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>
