@@ -1,488 +1,258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bản đồ xanh</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Bản đồ trồng cây xanh</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery.min.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/fullscreen/lg-fullscreen.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap" rel="stylesheet">
     <style>
-        * {
+        body, html {
+            height: 100%;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
             display: flex;
-            background-color: #f0f2f5;
-            overflow: hidden;
-        }
-        body.loaded {
-            overflow: auto;
-        }
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 78px;
-            background: #11101d;
-            padding: 6px 14px;
-            transition: all 0.5s ease;
-            z-index: 99;
-            overflow: hidden;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar.active {
-            width: 240px;
-        }
-        .sidebar .logo_content .logo {
-            color: #fff;
-            display: flex;
-            height: 50px;
-            width: 100%;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s ease;
-        }
-        .sidebar.active .logo_content .logo {
-            opacity: 1;
-            pointer-events: none;
-        }
-        .logo_content .logo i {
-            font-size: 28px;
-            margin-right: 5px;
-        }
-        .logo_content .logo .logo_name {
-            font-size: 16px;
-            font-weight: 400;
-            white-space: nowrap;
-            transition: all 0.5s ease;
-        }
-        .sidebar #btn {
-            position: absolute;
-            color: #fff;
-            left: 50%;
-            top: 6px;
-            font-size: 20px;
-            height: 50px;
-            width: 50px;
-            text-align: center;
-            line-height: 50px;
-            transform: translateX(-50%);
-            cursor: pointer;
-        }
-        .sidebar.active #btn {
-            left: 90%;
-        }
-        .sidebar ul {
-            margin-top: 20px;
-        }
-        .sidebar ul li {
-            position: relative;
-            height: 50px;
-            width: 100%;
-            margin: 0 5px 10px 5px;
-            list-style: none;
-            line-height: 50px;
-        }
-        .sidebar ul li a {
-            color: #fff;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            white-space: nowrap;
-            position: relative;
-            overflow: hidden;
-        }
-        .sidebar ul li a:hover {
-            color: #11101d;
-            background: #fff;
-            transform: translateX(5px);
-        }
-        .sidebar ul li i {
-            height: 50px;
-            min-width: 50px;
-            border-radius: 12px;
-            line-height: 50px;
-            text-align: center;
-        }
-        .sidebar .links_name {
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s ease;
-        }
-        .sidebar.active .links_name {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .sidebar ul li .tooltip {
-            position: absolute;
-            left: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-radius: 6px;
-            height: auto;
-            width: auto;
-            padding: 8px 12px;
-            background: #fff;
-            color: #11101d;
-            font-size: 14px;
-            white-space: nowrap;
-            line-height: 1.3;
-            text-align: center;
-            transition: 0s;
-            opacity: 0;
-            pointer-events: none;
-            display: block;
-        }
-        .sidebar.active ul li .tooltip {
-            display: none;
-        }
-        .sidebar ul li:hover .tooltip {
-            opacity: 1;
-        }
-        .sidebar ul li a .ripple {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-        }
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-        .sidebar ul li a.active {
-            background: #fff;
-            color: #11101d;
-        }
-        .sidebar ul li a.active i,
-        .sidebar ul li a.active .links_name {
-            color: #11101d;
-        }
-        .content {
-            margin-top: 90px;
-            margin-left: 78px;
-            padding: 20px;
-            transition: all 0.5s ease;
-            width: calc(100% - 78px);
-            position: relative;
-        }
-        .sidebar.active ~ .content {
-            margin-left: 240px;
-            width: calc(100% - 240px);
-        }
-        .content-section {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .content-section.active {
-            opacity: 1;
-            visibility: visible;
-            animation: fadeIn 0.5s ease-out;
-        }
-        .content-section h2 {
-            color: #11101d;
-            margin-bottom: 15px;
-        }
-        .content-section p {
-            color: #555;
-            line-height: 1.6;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        #loading-screen {
-            position: fixed;
-            z-index: 9999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #11101d;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            transition: opacity 0.5s ease-out;
-        }
-        #loading-screen.fade-out {
-            opacity: 0;
-        }
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .footer {
-            position: fixed;
-            left: 78px;
-            bottom: 0;
-            right: 0;
-            background-color: #11101d;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            transition: all 0.5s ease;
-            z-index: 97;
-        }
-        .sidebar.active ~ .footer {
-            left: 240px;
-        }
-        .header {
-            position: fixed;
-            top: 0;
-            left: 78px;
-            right: 0;
-            height: 80px;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: all 0.5s ease;
-            z-index: 98;
-            padding-top: 0px;
-        }
-        .sidebar.active ~ .header {
-            left: 240px;
-        }
-        .header .logo-container {
-            display: flex;
-            align-items: center;
             flex-direction: column;
-            justify-content: center;
-        }
-        .header .logos {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .header .logo {
-            height: 45px;
-            margin: 0 5px;
-        }
-        .header .location {
-            font-family: "Lalezar", system-ui;
-            font-size: 16px;
-            margin-top: 5px;
-            color: #11101d;
-        }
-        #map-container {
-            width: 100%;
-            padding-top: 75%; /* Tỷ lệ khung hình 4:3 */
-            position: relative;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
         }
         #map {
+            flex-grow: 1;
+            width: 100%;
+        }
+        
+        /* CSS cho header */
+        header {
+            position: relative;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        header::before {
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
-            bottom: 0;
             right: 0;
+            bottom: 0;
+            background-image: url('BG.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            z-index: -2;
+        }
+        header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #2ea05d;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-container img {
+            height: 40px;
+            margin: 0 5px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            position: relative;
+            z-index: 1;
+            font-family: 'Yeseva One', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 0.1em;
+        }
+        
+        /* CSS cho footer */
+        footer {
+            position: relative;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.9em;
+            overflow: hidden;
+        }
+        footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('BG.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            z-index: -2;
+        }
+        footer::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(44,166,92,1) 57%, rgba(21,116,44,1) 100%);
+            opacity: 0.3;
+            z-index: -1;
+        }
+        footer p {
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Style cho popup */
+        .custom-popup {
+            max-width: 300px;
+        }
+        .custom-popup .swiper {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+        }
+        .custom-popup .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .custom-popup p {
+            margin: 0;
+            padding: 5px 0;
+        }
+        
+        /* Style cho Lightbox */
+        .lg-backdrop {
+            background-color: rgba(0, 0, 0, 0.85);
         }
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-        <div class="loader"></div>
-    </div>
-
-    <div class="sidebar">
-        <div class="logo_content">
-            <div class="logo">
-                <i class="fas fa-map-marked-alt"></i>
-                <div class="logo_name">BẢN ĐỒ XANH</div>
-            </div>
-            <i class="fas fa-bars" id="btn"></i>
-        </div>
-        <ul class="nav_list">
-            <li>
-                <a href="#" class="nav-link active" data-target="tourism">
-                    <i class="fas fa-tree"></i>
-                    <span class="links_name">Khu du lịch xanh</span>
-                </a>
-                <span class="tooltip">Khu du lịch xanh</span>
-            </li>
-            <li>
-                <a href="#" class="nav-link" data-target="food">
-                    <i class="fas fa-utensils"></i>
-                    <span class="links_name">Địa điểm ăn uống</span>
-                </a>
-                <span class="tooltip">Địa điểm ăn uống</span>
-            </li>
-            <li>
-                <a href="#" class="nav-link" data-target="planting">
-                    <i class="fas fa-seedling"></i>
-                    <span class="links_name">Điểm trồng cây xanh</span>
-                </a>
-                <span class="tooltip">Điểm trồng cây xanh</span>
-            </li>
-        </ul>
-    </div>
-
-    <div class="header">
+    <header>
         <div class="logo-container">
-            <div class="logos">
-                <img src="logodoan.png" alt="Logo Đoàn TNCS Hồ Chí Minh" class="logo">
-                <img src="logohoi.png" alt="Logo Hội LHTN Việt Nam" class="logo">
-            </div>
-            <div class="location">HUYỆN CỦ CHI</div>
+            <img src="logodoan.png" alt="Logo Đoàn">
+            <img src="logohoi.png" alt="Logo Hội">
         </div>
-    </div>
+        <h1>Bản đồ phủ xanh</h1>
+    </header>
 
-    <div class="content">
-        <div id="tourism" class="content-section active">
-            <h2>Khu du lịch xanh</h2>
-            <p>Danh sách và thông tin về các khu du lịch xanh tại Củ Chi.</p>
-        </div>
-        <div id="food" class="content-section">
-            <h2>Địa điểm ăn uống nổi tiếng trên địa bàn</h2>
-            <p>Giới thiệu các quán ăn, nhà hàng đặc sắc tại Củ Chi.</p>
-        </div>
-        <div id="planting" class="content-section">
-            <h2>Điểm trồng cây xanh</h2>
-            <p>Thông tin về các điểm trồng cây xanh tại Củ Chi.</p>
-            <div id="map" style="height: 400px;"></div>
-        </div>
-    </div>
+    <div id="map"></div>
 
-    <div class="footer">
-        Thực hiện bởi Đoàn Thanh niên - Hội LHTN Việt Nam huyện Củ Chi & Đoàn TNCS Hồ Chí Minh Trường THPT Củ Chi
-    </div>
+    <footer>
+        <p>&copy; 2023 Bản đồ trồng cây xanh</p>
+    </footer>
 
     <script>
-        let startTime = new Date().getTime();
-        let btn = document.querySelector("#btn");
-        let sidebar = document.querySelector(".sidebar");
-        let navLinks = document.querySelectorAll(".nav-link");
-        let contentSections = document.querySelectorAll(".content-section");
+        // Tọa độ của Củ Chi, TP. Hồ Chí Minh
+        var cuChiCoords = [10.973042, 106.494047];
+        
+        var map = L.map('map').setView(cuChiCoords, 13);
 
-        btn.onclick = function() {
-            sidebar.classList.toggle("active");
-            document.querySelector(".footer").classList.toggle("active");
-            document.querySelector(".header").classList.toggle("active");
-        }
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                navLinks.forEach(item => item.classList.remove('active'));
-                this.classList.add('active');
+        var customIcon = L.icon({
+            iconUrl: 'marker.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
 
-                let targetId = this.getAttribute('data-target');
-                contentSections.forEach(section => {
-                    if (section.id === targetId) {
-                        section.classList.add('active');
-                    } else {
-                        section.classList.remove('active');
+        // Tạo nội dung HTML cho popup với slideshow
+        var popupContent = `
+            <div class="custom-popup">
+                <div class="swiper" id="swiper-popup">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="CNX ANT 1.jpg" alt="Củ Chi 1" data-src="cu-chi-image1.jpg">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="CNX ANT.jpg" alt="Củ Chi 2" data-src="cu-chi-image2.jpg">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="CNX ANT 2.jpg" alt="Củ Chi 3" data-src="cu-chi-image3.jpg">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="CNX ANT 3.jpg" alt="Củ Chi 4" data-src="cu-chi-image4.jpg">
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+                <p><strong>Củ Chi, TP. Hồ Chí Minh</strong></p>
+                <p>Địa điểm trồng cây xanh</p>
+            </div>
+        `;
+
+        // Thêm marker với popup chứa slideshow
+        var popup = L.popup({
+            maxWidth: 300
+        }).setContent(popupContent);
+
+        L.marker(cuChiCoords, {icon: customIcon}).addTo(map)
+            .bindPopup(popup)
+            .on('popupopen', function() {
+                var swiper = new Swiper('#swiper-popup', {
+                    loop: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                });
+
+                // Khởi tạo Lightbox
+                var lightbox = lightGallery(document.getElementById('swiper-popup'), {
+                    dynamic: true,
+                    dynamicEl: [
+                        { src: 'CNX ANT 1.jpg', thumb: 'cu-chi-image1.jpg' },
+                        { src: 'CNX ANT.jpg', thumb: 'cu-chi-image2.jpg' },
+                        { src: 'CNX ANT 2.jpg', thumb: 'cu-chi-image3.jpg' },
+                        { src: 'CNX ANT 3.jpg', thumb: 'cu-chi-image4.jpg' }
+                    ],
+                    plugins: [lgZoom, lgFullscreen],
+                    mobileSettings: {
+                        controls: false,
+                        showCloseIcon: true,
+                        download: false,
+                        rotate: false
                     }
                 });
 
-                let ripple = document.createElement('span');
-                ripple.className = 'ripple';
-                let rect = this.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                this.appendChild(ripple);
-
-                setTimeout(() => {
-                    ripple.remove();
-                }, 600);
-            });
-        });
-
-        window.addEventListener('load', () => {
-            let endTime = new Date().getTime();
-            let loadTime = endTime - startTime;
-            let minLoadTime = Math.max(loadTime, 1000);
-
-            setTimeout(function() {
-                let loadingScreen = document.getElementById('loading-screen');
-                loadingScreen.classList.add('fade-out');
-                
-                loadingScreen.addEventListener('transitionend', function() {
-                    loadingScreen.style.display = 'none';
-                    document.body.classList.add('loaded');
-                }, { once: true });
-            }, minLoadTime);
-
-            let homeLink = document.querySelector('.nav-link[data-target="tourism"]');
-            let ripple = document.createElement('span');
-            ripple.className = 'ripple';
-            ripple.style.left = '50%';
-            ripple.style.top = '50%';
-            ripple.style.transform = 'translate(-50%, -50%)';
-            homeLink.appendChild(ripple);
-
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-
-        document.querySelector('.nav-link[data-target="planting"]').addEventListener('click', function() {
-    setTimeout(() => {
-        if (!window.mapInitialized) {
-            let map = L.map('map').setView([10.9804, 106.4947], 13); // Tọa độ trung tâm Củ Chi
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // Thêm marker cho một số điểm trồng cây (ví dụ)
-            L.marker([10.9804, 106.4947]).addTo(map)
-                .bindPopup('Điểm trồng cây 1')
-                .openPopup();
-
-            L.marker([10.9904, 106.5047]).addTo(map)
-                .bindPopup('Điểm trồng cây 2');
-
-            window.mapInitialized = true;
-        }
-    }, 100); // Đợi một chút để đảm bảo phần tử đã hiển thị
-});
-    
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+                // Mở Lightbox khi click vào ảnh
+                swiper.slides.forEach(function(slide, index) {
+                    slide.querySelector('img').addEventListener('click', function() {
+                        lightbox.openGallery(index);
+                    });
                 });
             });
-        });
     </script>
 </body>
 </html>
